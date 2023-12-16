@@ -1,0 +1,53 @@
+.filter { ($0 > 2) && ($0 < 5) }
+            
+          //  .replaceError(with: 1)
+          //  .removeDuplicates()
+            
+          //  .scan(0, { $0 + $1 })
+          //  .scan(0, +)
+           // .reduce(0, +)
+            //.allSatisfy({ $0 < 200 })
+            //.debounce(for: 1, scheduler: DispatchQueue.main)
+           // .delay(for: 2, scheduler: DispatchQueue.main)
+//            .measureInterval(using: DispatchQueue.main)
+//            .map { "\($0.timeInterval)" }
+           // .throttle(for: 2, scheduler: DispatchQueue.main, latest: true)
+           // .retry(3)
+           // .timeout(2, scheduler: DispatchQueue.main)
+//            .combineLatest(dataService.boolThroughPublisher)
+//            .compactMap{ (int, bool) in
+//                if bool {
+//                    return String(int)
+//                } else {
+//                    return nil
+//                }
+//            }
+           // .merge(with: dataService.passThroughPublisher3)
+           // .zip(dataService.passThroughPublisher3)
+            .tryCatch { error in
+                guard let error = error as? URLError,
+                      error.code == .badServerResponse else {
+                    throw error
+                }
+                return self.dataService.passThroughPublisher3
+            }
+            .replaceNil(with: 100)
+            .map { String($0) }
+
+           // .collect()
+            //.collect(3)
+            .sink { completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    print("ASd")
+                    print("error ", error.localizedDescription)
+                    self.error = error.localizedDescription
+                }
+            } receiveValue: { [weak self] returnedValue in
+               // self?.data = returnedValue
+                self?.data.append(returnedValue)
+                
+            }
+            .store(in: &cancellables)
